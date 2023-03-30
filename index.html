@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script src="https://cdn.geogebra.org/apps/deployggb.js"></script>
+    <script src="script.js"></script>
+    <h1>Problema de Programación Lineal</h1>
+    <label for="objetivo">Objetivo:</label>
+    <select id="objetivo" name="objetivo">
+        <option value="Maximize">Maximizar</option>
+        <option value="Minimize">Minimizar</option>
+    </select>
+    <br>
+    <label for="funcion-objetivo">Función objetivo:</label>
+    <input type="text" id="funcion-objetivo" name="funcion-objetivo">
+    <br>
+    <div id="restricciones">
+        <label for="restriccion1">Restricción 1:</label>
+        <input type="text" id="restriccion1" name="restriccion1">
+    </div>
+    <button type="button" onclick="agregarRestriccion()">Agregar restricción</button>
+    <button type="button" onclick="graficar()">Grafifcar</button>
+    <div id="ggbApplet"></div>
+</body>
+
+
+
+</html>
+
+</html>
