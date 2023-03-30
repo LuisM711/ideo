@@ -6,6 +6,7 @@ onload = (event) => {
   document.getElementById("restriccion2").value = "150x+100y=3000";
   document.getElementById("restriccion3").value = "67x+25y=1000";
 }
+let letrasMayusculas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 function agregarRestriccion() {
   var restricciones = document.getElementById("restricciones");
   var numRestricciones = restricciones.childElementCount;
@@ -69,54 +70,54 @@ function graficar() {
     //"showSuggestionButtons":false,
     appletOnLoad(api) {
       api.evalCommand(codigoGeoGebra);
-      const maxX = Math.max(api.getXcoord("A"), api.getXcoord("B"));
-      const maxY = Math.max(api.getYcoord("A"), api.getYcoord("B"));
-    
-      // Definir la caja de límites
-      const boundingBox = {
-        xmin: 0,
-        xmax: maxX,
-        ymin: 0,
-        ymax: maxY
-      };
-    //  // Ajustar el tamaño del applet
-    //  api.evalCommand(`ZoomOut(${boundingBox.ymax/4})`);
-      api.setCoordSystem(boundingBox.xmin-5,boundingBox.xmax+5,boundingBox.ymin-5,boundingBox.ymax+5);
-    
-   
-    
+      let xmax = 0;
+      let ymax = 0;
+      restricciones.forEach((value, index) => {
+        //console.log(index,value);
+        if (restricciones[index][0].x > xmax) xmax = restricciones[index][0].x;
+        if (restricciones[index][1].x > xmax) xmax = restricciones[index][1].x;
+
+        if (restricciones[index][0].y > ymax) ymax = restricciones[index][0].y;
+        if (restricciones[index][1].y > ymax) ymax = restricciones[index][1].y;
+
+      });
+      api.setCoordSystem(-5, xmax + 5, -5, ymax + 5);
+
     }
   }, 'ggbApplet');
 
-    
- 
-  // var codigoGeoGebra = `
-  //   Objetivo(${objetivo});
-  //   ${restriccionesString};
-  //   x>0;
-  //   y>0;
-  //   RegionPlot(Intersection(${restriccionesString}, x>0, y>0));
-  // `;
-  let codigoGeoGebra = `A = (x=${restricciones[0][0].x},y=${restricciones[0][0].y})`;
-  codigoGeoGebra += "\n";
-  codigoGeoGebra += `B = (x=${restricciones[0][1].x},y=${restricciones[0][1].y})`;
-  codigoGeoGebra += "\n";
-  codigoGeoGebra += `C = (x=${restricciones[1][0].x},y=${restricciones[1][0].y})`;
-  codigoGeoGebra += "\n";
-  codigoGeoGebra += `D = (x=${restricciones[1][1].x},y=${restricciones[1][1].y})`;
-  codigoGeoGebra += "\n";
-  codigoGeoGebra += `E = (x=${restricciones[2][0].x},y=${restricciones[2][0].y})`;
-  codigoGeoGebra += "\n";
-  codigoGeoGebra += `F = (x=${restricciones[2][1].x},y=${restricciones[2][1].y})`;
-  codigoGeoGebra += "\n";
-  codigoGeoGebra +="X=Segment(A,B)\nY=Segment(C,D)\nZ=Segment(E,F)";
-  
-  // let codigoGeoGebra = "A = (x="+restricciones[0][0].x+",y="+restricciones[0][0].y+")\n";
-  // codigoGeoGebra+="B = (x="+restricciones[0][1].x+",y="+restricciones[0][1].y+")\n";
-  // codigoGeoGebra+="F=Segment(A,B)\n"
-  
 
- 
+
+  // let codigoGeoGebra = `A = (x=${restricciones[0][0].x},y=${restricciones[0][0].y})`;
+  // codigoGeoGebra += "\n";
+  // codigoGeoGebra += `B = (x=${restricciones[0][1].x},y=${restricciones[0][1].y})`;
+  // codigoGeoGebra += "\n";
+  // codigoGeoGebra += `C = (x=${restricciones[1][0].x},y=${restricciones[1][0].y})`;
+  // codigoGeoGebra += "\n";
+  // codigoGeoGebra += `D = (x=${restricciones[1][1].x},y=${restricciones[1][1].y})`;
+  // codigoGeoGebra += "\n";
+  // codigoGeoGebra += `E = (x=${restricciones[2][0].x},y=${restricciones[2][0].y})`;
+  // codigoGeoGebra += "\n";
+  // codigoGeoGebra += `F = (x=${restricciones[2][1].x},y=${restricciones[2][1].y})`;
+  // codigoGeoGebra += "\n";
+  // codigoGeoGebra +="X=Segment(A,B)\nY=Segment(C,D)\nZ=Segment(E,F)";
+  let codigoGeoGebra = "";
+  let c = 0;
+
+  restricciones.forEach((value, index) => {
+    //console.log(index,value);
+
+    codigoGeoGebra += `${letrasMayusculas[c]} = (x=${restricciones[index][0].x}, y = ${restricciones[index][0].y})`;
+    codigoGeoGebra += "\n";
+    codigoGeoGebra += `${letrasMayusculas[c + 1]} = (x=${restricciones[index][1].x}, y = ${restricciones[index][1].y})`;
+    codigoGeoGebra += "\n";
+    codigoGeoGebra += `Seg${letrasMayusculas[c]}${letrasMayusculas[c + 1]} = Segment(${letrasMayusculas[c]},${letrasMayusculas[c + 1]})`;
+    codigoGeoGebra += "\n";
+    c += 2;
+  });
+
+
+
 
 
 
