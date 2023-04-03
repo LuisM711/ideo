@@ -2,9 +2,9 @@ onload = (event) => {
   agregarRestriccion();
   agregarRestriccion();
   document.getElementById("funcion-objetivo").value = "40x+50y";
-  document.getElementById("restriccion1").value = "125x+200y=5000";
-  document.getElementById("restriccion2").value = "150x+100y=3000";
-  document.getElementById("restriccion3").value = "67x+25y=1000";
+  document.getElementById("restriccion1").value = "125x+200y<=5000";
+  document.getElementById("restriccion2").value = "150x+100y<=3000";
+  document.getElementById("restriccion3").value = "67x+25y<=1000";
 }
 let letrasMayusculas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 function agregarRestriccion() {
@@ -30,13 +30,19 @@ function calcularPuntos(ecuacion) {
   // Devolver los puntos
   return [punto1, punto2];
 }
-
+convertirIgual = (restriccion="") =>{
+  if(restriccion.includes("<="))return restriccion.replace("<=","=");
+  else if(restriccion.includes(">="))return restriccion.replace(">=","=");
+  else if(restriccion.includes("<="))return restriccion.replace("<=","=");
+  else if(restriccion.includes("="))return restriccion.replace("=","=");
+  else console.log("error inecuacion");
+}
 function graficar() {
   var objetivo = document.getElementById("objetivo").value;
   var restriccionesInputs = document.querySelectorAll("#restricciones input");
   var restricciones = [];
   for (var i = 0; i < restriccionesInputs.length; i++) {
-    var restriccion = restriccionesInputs[i].value;
+    var restriccion = convertirIgual(restriccionesInputs[i].value);
     if (restriccion) {
       restricciones.push(calcularPuntos(restriccion));
     }
