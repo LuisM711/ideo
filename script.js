@@ -38,7 +38,7 @@ convertirIgual = (restriccion = "") => {
   else console.log("error inecuacion");
 }
 graficar = () => {
-  var objetivo = document.getElementById("objetivo").value;
+  var objetivo = parseInt(document.getElementById("objetivo").value);
   var restriccionesInputs = document.querySelectorAll("#restricciones input");
   var restricciones = [];
   let arregloInecuaciones = [];
@@ -56,9 +56,9 @@ graficar = () => {
     //"material_id": "mwH6n8f6",
     "width": 800,
     "height": 600,
-    "showToolBar": true,
-    "showMenuBar": true,
-    "showAlgebraInput": true,
+    "showToolBar": false,
+    "showMenuBar": false,
+    "showAlgebraInput": false,
     "allowUpscale": true,
     "enableLabelDrags": true,
     "enableShiftDragZoom": true,
@@ -74,9 +74,9 @@ graficar = () => {
     "synchronizationTimeout": null,
     "enableUndoRedo": true,
     "enableRightClick": true,
-    //"showAnimationButton":false,
-    //"showFullscreenButton":false,
-    //"showSuggestionButtons":false,
+    "showAnimationButton":false,
+    "showFullscreenButton":false,
+    "showSuggestionButtons":false,
     appletOnLoad(api) {
       api.setRounding("5");
       api.evalCommand(codigoGeoGebra);
@@ -94,8 +94,8 @@ graficar = () => {
         listaPuntosRegionFactible.push({ "Nombre": nombrePuntos[i], x: valor[1].split(',')[0].replace(/[^0-9.]+/g, ""), y: valor[1].split(',')[1].replace(/[^0-9.]+/g, "") });
         //console.log(listaPuntosRegionFactible);
       }
-      const pointsWithSameCoords = JSON.parse(encontrarCoincidencias(listaPuntosRegionFactible));
-      //->console.log(pointsWithSameCoords);
+      const puntosConLasMismasCoordenadas = JSON.parse(encontrarCoincidencias(listaPuntosRegionFactible));
+      //->console.log(puntosConLasMismasCoordenadas);
       //console.log(listaPuntosRegionFactible);
       let xmax = 0;
       let ymax = 0;
@@ -110,12 +110,11 @@ graficar = () => {
       });
       api.setCoordSystem(-5, xmax + 5, -5, ymax + 5);
       let codigo = "";
-      //alert(api.getValue("F.y"));
       api.deleteObject("Punto_{2}");
       let count = 0;
-      for (count = 0; count < pointsWithSameCoords.length; count++) {
-        //codigo+=`PuntoRF${i+1} = Intersect(x=${pointsWithSameCoords[i].x},y=${pointsWithSameCoords[i].y})`;
-        codigo += `${letrasMayusculas[count]} = Intersect(x=${pointsWithSameCoords[count].x},y=${pointsWithSameCoords[count].y})`;
+      for (count = 0; count < puntosConLasMismasCoordenadas.length; count++) {
+        //codigo+=`PuntoRF${i+1} = Intersect(x=${puntosConLasMismasCoordenadas[i].x},y=${puntosConLasMismasCoordenadas[i].y})`;
+        codigo += `${letrasMayusculas[count]} = Intersect(x=${puntosConLasMismasCoordenadas[count].x},y=${puntosConLasMismasCoordenadas[count].y})`;
 
         codigo += "\n";
       }
@@ -127,20 +126,70 @@ graficar = () => {
         if(i%2==0)api.setVisible(`Seg${i+1}y${i+2}`,false);
       }
       api.setLabelVisible('regionFactible',false);
-      api.setPointSize('A',8);
+      //api.setPointSize('A',8);
+      let funcion_objetivo = document.getElementById("funcion-objetivo").value;
+      let coeficienteX = 0;
+      let coeficienteY = 0;
+      let signo = '';
+      if(funcion_objetivo.includes('+'))
+      {
+        signo = '+';
+        coeficienteX = funcion_objetivo.split('+')[0].replace(/[^0-9.]+/g, "");
+        coeficienteY = funcion_objetivo.split('+')[1].replace(/[^0-9.]+/g, "");
+      }else if(funcion_objetivo.includes('-')){
+        signo = '-';
+        coeficienteX = funcion_objetivo.split('-')[0].replace(/[^0-9.]+/g, "");
+        coeficienteY = funcion_objetivo.split('-')[1].replace(/[^0-9.]+/g, "");
+      }else console.log("error en coeficiente F O");
       let evaluacion = document.createElement("div");
       evaluacion.innerHTML = "<h2>Encontrando la solucion optima</h2>";
+      evaluacion.innerHTML += `<h2>Funcion objetivo: <u>${funcion_objetivo}</u></h2>`;
       evaluacion.innerHTML += "<p>";
-      
-      for(let i = 0;i < pointsWithSameCoords.length;i++)
+      let valor = [];
+      let can = 0;
+      for(let i = 0;i < puntosConLasMismasCoordenadas.length;i++)
       {
+        signo=='+'? can = Number((coeficienteX*puntosConLasMismasCoordenadas[i].x)+(coeficienteY*puntosConLasMismasCoordenadas[i].y)).toFixed(2):can =Number((coeficienteX*puntosConLasMismasCoordenadas[i].x)-(coeficienteY*puntosConLasMismasCoordenadas[i].y)).toFixed(2);
+        valor.push({"index":i+1,"cantidad":can});
         evaluacion.innerHTML+=`
-        ${letrasMayusculas[i]}(${pointsWithSameCoords[i].x},
-          ${pointsWithSameCoords[i].y}) = aun no hago esto`;
+        ${letrasMayusculas[i]}(${puntosConLasMismasCoordenadas[i].x},
+          ${puntosConLasMismasCoordenadas[i].y}) = ${coeficienteX}(${puntosConLasMismasCoordenadas[i].x})${signo}${coeficienteY}(${puntosConLasMismasCoordenadas[i].y}) = ${valor[i].cantidad}`;
         evaluacion.innerHTML+="<br>";
       }
       evaluacion.innerHTML+="</p>"
+      let maximo = Math.max(...(valor.map(valor=>parseFloat(valor.cantidad))));
+      const registro_mayor_cantidad = valor.reduce((max, obj) => {
+        const cantidad = parseFloat(obj.cantidad);
+        return cantidad > max.cantidad ? { ...obj } : { ...max };
+      });
+      const registro_menor_cantidad = valor.reduce((min, obj) => {
+        const cantidad = parseFloat(obj.cantidad);
+        return cantidad < min.cantidad ? { ...obj } : { ...min };
+      });
+      
+      //console.log(registro_mayor_cantidad);
+      //console.log(registro_menor_cantidad);
+      if(objetivo===1)
+      {
+        api.setColor(letrasMayusculas[registro_mayor_cantidad.index-1],255,0,0);
+        api.setPointSize(letrasMayusculas[registro_mayor_cantidad.index-1],9);
+        evaluacion.innerHTML+= `<h3>Solucion optima: x = ${puntosConLasMismasCoordenadas[registro_mayor_cantidad.index-1].x}, y = ${puntosConLasMismasCoordenadas[registro_mayor_cantidad.index-1].y} = ${registro_mayor_cantidad.cantidad}</h3>`;
+
+      }
+      else if(objetivo===2)
+      {
+        api.setColor(letrasMayusculas[registro_menor_cantidad.index-1],255,0,0);
+        api.setPointSize(letrasMayusculas[registro_menor_cantidad.index-1],9);
+        evaluacion.innerHTML+= `<h3>Solucion optima: x = ${puntosConLasMismasCoordenadas[registro_menor_cantidad.index-1].x}, y = ${puntosConLasMismasCoordenadas[registro_menor_cantidad.index-1].y} = ${registro_menor_cantidad.cantidad}</h3>`;
+
+      }
+      else
+      {
+
+      }
+      document.getElementById("evaluacion").innerHTML = "";
       document.getElementById("evaluacion").appendChild(evaluacion);
+      
       //Color
       //api.setColor('A',255,0,0);
       //api.setLineStyle("A",3);
@@ -180,120 +229,6 @@ graficar = () => {
   ggbApp.inject('ggbApplet');
   //ggbApp.evalCommand(codigoGeoGebra);
 }
-// function feasibleRegion(inequalities) {
-//   let points = [];
-//   for (let i = 0; i < inequalities.length; i++) {
-//       for (let j = i + 1; j < inequalities.length; j++) {
-//           let eq1 = inequalities[i];
-//           let eq2 = inequalities[j];
-//           if (eq1.includes('x') && eq1.includes('y') && eq2.includes('x') && eq2.includes('y')) {
-//               let a1 = parseFloat(eq1.split('x')[0]);
-//               let b1 = parseFloat(eq1.split('x')[1].split('y')[0]);
-//               let c1 = parseFloat(eq1.split('y')[1].split('=')[1]);
-//               let a2 = parseFloat(eq2.split('x')[0]);
-//               let b2 = parseFloat(eq2.split('x')[1].split('y')[0]);
-//               let c2 = parseFloat(eq2.split('y')[1].split('=')[1]);
-//               let det = a1 * b2 - a2 * b1;
-//               if (det != 0) {
-//                   let x = (c1 * b2 - c2 * b1) / det;
-//                   let y = (a1 * c2 - a2 * c1) / det;
-//                   if (isFeasible(x, y, inequalities)) {
-//                       points.push({x: x, y: y});
-//                   }
-//               }
-//           }
-//       }
-//   }
-//   return {points: points};
-// }
-
-// function isFeasible(x, y, inequalities) {
-//   for (let i = 0; i < inequalities.length; i++) {
-//       let eq = inequalities[i];
-//       if (eq.includes('x') && eq.includes('y')) {
-//           let a = parseFloat(eq.split('x')[0]);
-//           let b = parseFloat(eq.split('x')[1].split('y')[0]);
-//           let c = parseFloat(eq.split('y')[1].split('=')[1]);
-//           if (eq.includes("<=")) {
-//               if (a * x + b * y > c) {
-//                   return false;
-//               }
-//           } else if (eq.includes(">=")) {
-//               if (a * x + b * y < c) {
-//                   return false;
-//               }
-//           } else if (eq.includes("=")) {
-//               if (a * x + b * y != c) {
-//                   return false;
-//               }
-//           }
-//       } else if (eq.includes('x')) {
-//           let a = parseFloat(eq.split('x')[0]);
-//           let c = parseFloat(eq.split('=')[1]);
-//           if (eq.includes("<=")) {
-//               if (a * x > c) {
-//                   return false;
-//               }
-//           } else if (eq.includes(">=")) {
-//               if (a * x < c) {
-//                   return false;
-//               }
-//           } else if (eq.includes("=")) {
-//               if (a * x != c) {
-//                   return false;
-//               }
-//           }
-//       } else if (eq.includes('y')) {
-//           let a = parseFloat(eq.split('y')[0]);
-//           let c = parseFloat(eq.split('=')[1]);
-//           if (eq.includes("<=")) {
-//               if (a * y > c) {
-//                   return false;
-//               }
-//           } else if (eq.includes(">=")) {
-//               if (a * y < c) {
-//                   return false;
-//               }
-//           } else if (eq.includes("=")) {
-//               if (a * y != c) {
-//                   return false;
-//               }
-//           }
-//       }
-//   }
-//   return true;
-// }
-// encontrarCoincidencias = (datos) =>{
-//   let resultados = [];
-//   for (let i = 0; i < datos.length; i++) {
-//     for (let j = i + 1; j < datos.length; j++) {
-//       if (datos[i].x === datos[j].x && datos[i].y === datos[j].y) {
-//         resultados.push(datos[i].Nombre);
-//         resultados.push(datos[j].Nombre);
-//       }
-//     }
-//   }
-//   return resultados;
-// }
-// function encontrarCoincidenciasS(array) {
-//   const coordenadas = {};
-//   for (let i = 0; i < array.length; i++) {
-//     const coordenada = array[i].x + ',' + array[i].y;
-//     if (coordenada in coordenadas) {
-//       coordenadas[coordenada].push(array[i].Nombre);
-//     } else {
-//       coordenadas[coordenada] = [array[i].Nombre];
-//     }
-//   }
-
-//   const nombresCoincidentes = Object.values(coordenadas).filter(nombres => nombres.length > 1);
-//   if (nombresCoincidentes.length === 0) {
-//     return null; // retorna null si no se encuentran coincidencias
-//   }
-
-//   const nombres = nombresCoincidentes.flat();
-//   return nombres.join(', '); // retorna una cadena con los nombres separados por comas
-// }
 function encontrarCoincidencias(array) {
   let puntosRepetidos = [];
   let puntosFinales = [];
