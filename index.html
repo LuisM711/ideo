@@ -11,11 +11,11 @@
 <body>
     <script src="https://cdn.geogebra.org/apps/deployggb.js"></script>
     <script src="script.js"></script>
-    <h1>Problema de Programación Lineal</h1>
+    <h1>Método gráfico</h1>
     <label for="objetivo">Objetivo:</label>
     <select id="objetivo" name="objetivo">
-        <option value="Maximize">Maximizar</option>
-        <option value="Minimize">Minimizar</option>
+        <option value="1">Maximizar</option>
+        <option value="2">Minimizar</option>
     </select>
     <br>
     <label for="funcion-objetivo">Función objetivo:</label>
@@ -27,11 +27,12 @@
     </div>
     <button type="button" onclick="agregarRestriccion()">Agregar restricción</button>
     <button type="button" onclick="graficar()">Graficar</button>
+    <div class="container">
     <div id="ggbApplet"></div>
+    <div id="evaluacion"></div>
+    </div>
 </body>
 
 
-
-</html>
 
 </html>
