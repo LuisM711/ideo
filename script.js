@@ -95,8 +95,6 @@ graficar = () => {
         //console.log(listaPuntosRegionFactible);
       }
       const puntosConLasMismasCoordenadas = JSON.parse(encontrarCoincidencias(listaPuntosRegionFactible));
-      //->console.log(puntosConLasMismasCoordenadas);
-      //console.log(listaPuntosRegionFactible);
       let xmax = 0;
       let ymax = 0;
       restricciones.forEach((value, index) => {
