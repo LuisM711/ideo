@@ -2,7 +2,7 @@ onload = (event) => {
   agregarRestriccion();
   agregarRestriccion();
   document.getElementById("funcion-objetivo").value = "40x+50y";
-  document.getElementById("restriccion1").value = "125x+200y<=5000";
+  document.getElementById("restriccion1").value = "12 5x+200y<=5000";
   document.getElementById("restriccion2").value = "150x+100y<=3000";
   document.getElementById("restriccion3").value = "67x+25y<=1000";
 }
