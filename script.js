@@ -57,6 +57,12 @@ graficar = () => {
   else {
     avisoError("Hubo un error en los datos"); return false;
   }
+  if(!validarObjetivo()){
+    avisoError("Hubo un error en la función objetivo"); 
+    document.getElementById("todo").hidden = true;
+    return false;
+    
+  } else document.getElementById("todo").hidden = false;
   var objetivo = parseInt(document.getElementById("objetivo").value);
   var restriccionesInputs = document.querySelectorAll("#restricciones input");
   var restricciones = [];
@@ -106,7 +112,7 @@ graficar = () => {
       let listaPuntosRegionFactible = [];
       let nombrePuntos = api.evalCommandGetLabels("Punto = Vertex(regionFactible)").split(",");
       if (nombrePuntos.length === 1) {
-        avisoError("No hay puntos para trazar una region factible");
+        avisoError("No hay puntos para trazar una región factible");
         flag = false;
       }//console.log(nombrePuntos);
       //console.log(api.getValueString(nombrePuntos[0]));
@@ -122,13 +128,14 @@ graficar = () => {
       let ymax = 0;
       restricciones.forEach((value, index) => {
         //console.log(index,value);
-        if (restricciones[index][0].x > xmax) xmax = restricciones[index][0].x;
-        if (restricciones[index][1].x > xmax) xmax = restricciones[index][1].x;
+        if (restricciones[index][0].x > xmax && restricciones[index][0].x!=Infinity) xmax = restricciones[index][0].x;
+        if (restricciones[index][1].x > xmax && restricciones[index][1].x!=Infinity) xmax = restricciones[index][1].x;
 
-        if (restricciones[index][0].y > ymax) ymax = restricciones[index][0].y;
-        if (restricciones[index][1].y > ymax) ymax = restricciones[index][1].y;
+        if (restricciones[index][0].y > ymax && restricciones[index][0].y!=Infinity) ymax = restricciones[index][0].y;
+        if (restricciones[index][1].y > ymax && restricciones[index][1].y!=Infinity) ymax = restricciones[index][1].y;
 
       });
+      console.log(xmax,ymax);
       api.setCoordSystem(-5, xmax + 5, -5, ymax + 5);
       let codigo = "";
       api.deleteObject("Punto_{2}");
@@ -145,7 +152,8 @@ graficar = () => {
         api.setColor(`${letrasMayusculas[count]}`, 0, 0, 0);
         api.setLabelStyle(`${letrasMayusculas[count]}`, 1);
         api.setLayer(`${letrasMayusculas[count]}`, 9);
-        api.setLabelVisible(`${letrasMayusculas[count]}`, !0)
+        api.setLabelVisible(`${letrasMayusculas[count]}`, !0);
+        api.setColor(`${letrasMayusculas[count]}`, 128,0,128);
       }
       //api.setVisible("A",false);
       for (let i = 0; i < c; i++) {
@@ -160,6 +168,7 @@ graficar = () => {
           api.setLabelVisible(`Seg${i + 1}y${i + 2}`, true);
           api.setLabelStyle(`Seg${i + 1}y${i + 2}`, 3);
           api.setLayer(`Seg${i + 1}y${i + 2}`, 0);
+          //api.setColor(`Seg${i + 1}y${i + 2}`, 0,255,0);
         }
       }
       api.setLabelVisible('regionFactible', false);
@@ -232,7 +241,7 @@ graficar = () => {
       celdaCoordenadas.textContent = 'Coordenadas(X,Y)';
 
       const celdaEvaluacion = document.createElement('th');
-      celdaEvaluacion.textContent = `Evaluacion con la funcion objetivo z = ${funcion_objetivo}`;
+      celdaEvaluacion.textContent = `Evaluación con la función objetivo z = ${funcion_objetivo}`;
 
       // Agregar las celdas a la fila de la cabecera
       filaCabecera.appendChild(celdaPunto);
@@ -297,17 +306,17 @@ graficar = () => {
         arreglo.push(valor[registro_mayor_cantidad.index - 1].x)
         arreglo.push(valor[registro_mayor_cantidad.index - 1].y);
         if(signo == '+')
-        parr.textContent = `La solucion optima es Z = ${(coeficienteX * arreglo[0] + coeficienteY * arreglo[1]).toFixed(2)}`;
+        parr.textContent = `La solución óptima es Z = ${(coeficienteX * arreglo[0] + coeficienteY * arreglo[1]).toFixed(2)}`;
         else
-        parr.textContent = `La solucion optima es Z = ${(coeficienteX * arreglo[0] - coeficienteY * arreglo[1]).toFixed(2)}`;
+        parr.textContent = `La solución óptima es Z = ${(coeficienteX * arreglo[0] - coeficienteY * arreglo[1]).toFixed(2)}`;
 
       } else {
         arreglo.push(valor[registro_menor_cantidad.index - 1].x)
         arreglo.push(valor[registro_menor_cantidad.index - 1].y);
         if(signo == '-')
-        parr.textContent = `La solucion optima es Z = ${(coeficienteX * arreglo[0] - coeficienteY * arreglo[1]).toFixed(2)}`;
+        parr.textContent = `La solución óptima es Z = ${(coeficienteX * arreglo[0] - coeficienteY * arreglo[1]).toFixed(2)}`;
         else
-        parr.textContent = `La solucion optima es Z = ${(coeficienteX * arreglo[0] + coeficienteY * arreglo[1]).toFixed(2)}`;
+        parr.textContent = `La solución óptima es Z = ${(coeficienteX * arreglo[0] + coeficienteY * arreglo[1]).toFixed(2)}`;
       }
       alerta.appendChild(parr);
       alerta.appendChild(document.createElement("hr"));
@@ -332,7 +341,7 @@ graficar = () => {
         api.setPointSize(letrasMayusculas[registro_mayor_cantidad.index - 1], 9);
         api.setLineThickness(letrasMayusculas[registro_mayor_cantidad.index - 1], 10);
         marcarFila(registro_mayor_cantidad.index - 1);
-        evaluacion.innerHTML += `<h3>Solucion optima: x = ${puntosConLasMismasCoordenadas[registro_mayor_cantidad.index - 1].x}, y = ${puntosConLasMismasCoordenadas[registro_mayor_cantidad.index - 1].y} = ${registro_mayor_cantidad.cantidad}</h3>`;
+        evaluacion.innerHTML += `<h3>Solución óptima: x = ${puntosConLasMismasCoordenadas[registro_mayor_cantidad.index - 1].x}, y = ${puntosConLasMismasCoordenadas[registro_mayor_cantidad.index - 1].y} = ${registro_mayor_cantidad.cantidad}</h3>`;
 
       }
       else if (objetivo === 2) {
@@ -340,7 +349,7 @@ graficar = () => {
         api.setPointSize(letrasMayusculas[registro_menor_cantidad.index - 1], 9);
         api.setLineThickness(letrasMayusculas[registro_menor_cantidad.index - 1], 10);
         marcarFila(registro_menor_cantidad.index - 1);
-        evaluacion.innerHTML += `<h3>Solucion optima: x = ${puntosConLasMismasCoordenadas[registro_menor_cantidad.index - 1].x}, y = ${puntosConLasMismasCoordenadas[registro_menor_cantidad.index - 1].y} = ${registro_menor_cantidad.cantidad}</h3>`;
+        evaluacion.innerHTML += `<h3>Solución óptima: x = ${puntosConLasMismasCoordenadas[registro_menor_cantidad.index - 1].x}, y = ${puntosConLasMismasCoordenadas[registro_menor_cantidad.index - 1].y} = ${registro_menor_cantidad.cantidad}</h3>`;
 
       }
       else {
@@ -428,9 +437,13 @@ validar = () => {
   }
   return true;
 }
+validarObjetivo = () =>{
+  let re = /^\d*\.?\d+x\s*[+-]\s*\d*\.?\d+y$/i;
+  return re.test(document.getElementById("funcion-objetivo").value);
+}
 reconocerInecuacion = (str) => {
   //var re = /^(-?\d*\.?\d+|\d*[a-z]|\d+)\s*[+]\s*(-?\d*\.?\d+|\d*[a-z]|\d+)\s*([<>]?=)\s*(-?\d*\.?\d+)$/;
-  let re = /^\d*x\s*[+-]\s*\d*y\s*(?:>=|<=)\s*\d+$/;
+  let re = /^\d*(?:\.\d+)?x\s*[+-]\s*\d*(?:\.\d+)?y\s*(?:>=|<=)\s*\d*(?:\.\d+)?$/i;
   return re.test(str);
 }
 limpiar = () => {
