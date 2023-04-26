@@ -1,6 +1,7 @@
 onload = (event) => {
   agregarRestriccion();
   agregarRestriccion();
+  agregarRestriccion();
   document.getElementById("funcion-objetivo").value = "40x+50y";
   document.getElementById("restriccion1").value = "125x+200y<=5000";
   document.getElementById("restriccion2").value = "150x+100y<=3000";
@@ -9,12 +10,12 @@ onload = (event) => {
 
 
 
-
 let letrasMayusculas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 agregarRestriccion = () => {
-  var restricciones = document.getElementById("restricciones");
-  var numRestricciones = restricciones.childElementCount;
-  var nuevaRestriccion = document.createElement("div");
+  let restricciones = document.getElementById("restricciones");
+  let numRestricciones = restricciones.childElementCount;
+  numRestricciones++;
+  let nuevaRestriccion = document.createElement("div");
   nuevaRestriccion.innerHTML = `
       <label for="restriccion${numRestricciones}">
         Restricción ${numRestricciones}:
@@ -28,7 +29,7 @@ quitarRestriccion = () => {
   let restricciones = document.getElementById("restricciones");
   let ultimo = restricciones.lastElementChild;
   //console.log(restricciones.childElementCount)
-  if (restricciones.childElementCount >= 3)
+  if (restricciones.childElementCount >= 2)
     restricciones.removeChild(ultimo);
 
 }
@@ -57,11 +58,11 @@ graficar = () => {
   else {
     avisoError("Hubo un error en los datos"); return false;
   }
-  if(!validarObjetivo()){
-    avisoError("Hubo un error en la función objetivo"); 
+  if (!validarObjetivo()) {
+    avisoError("Hubo un error en la función objetivo");
     document.getElementById("todo").hidden = true;
     return false;
-    
+
   } else document.getElementById("todo").hidden = false;
   var objetivo = parseInt(document.getElementById("objetivo").value);
   var restriccionesInputs = document.querySelectorAll("#restricciones input");
@@ -128,14 +129,14 @@ graficar = () => {
       let ymax = 0;
       restricciones.forEach((value, index) => {
         //console.log(index,value);
-        if (restricciones[index][0].x > xmax && restricciones[index][0].x!=Infinity) xmax = restricciones[index][0].x;
-        if (restricciones[index][1].x > xmax && restricciones[index][1].x!=Infinity) xmax = restricciones[index][1].x;
+        if (restricciones[index][0].x > xmax && restricciones[index][0].x != Infinity) xmax = restricciones[index][0].x;
+        if (restricciones[index][1].x > xmax && restricciones[index][1].x != Infinity) xmax = restricciones[index][1].x;
 
-        if (restricciones[index][0].y > ymax && restricciones[index][0].y!=Infinity) ymax = restricciones[index][0].y;
-        if (restricciones[index][1].y > ymax && restricciones[index][1].y!=Infinity) ymax = restricciones[index][1].y;
+        if (restricciones[index][0].y > ymax && restricciones[index][0].y != Infinity) ymax = restricciones[index][0].y;
+        if (restricciones[index][1].y > ymax && restricciones[index][1].y != Infinity) ymax = restricciones[index][1].y;
 
       });
-      console.log(xmax,ymax);
+      //console.log(xmax, ymax);
       api.setCoordSystem(-5, xmax + 5, -5, ymax + 5);
       let codigo = "";
       api.deleteObject("Punto_{2}");
@@ -153,7 +154,7 @@ graficar = () => {
         api.setLabelStyle(`${letrasMayusculas[count]}`, 1);
         api.setLayer(`${letrasMayusculas[count]}`, 9);
         api.setLabelVisible(`${letrasMayusculas[count]}`, !0);
-        api.setColor(`${letrasMayusculas[count]}`, 128,0,128);
+        api.setColor(`${letrasMayusculas[count]}`, 128, 0, 128);
       }
       //api.setVisible("A",false);
       for (let i = 0; i < c; i++) {
@@ -164,7 +165,7 @@ graficar = () => {
         // api.setCaption(`Punto${i + 1}`,`(${x},${y})`);
         if (i % 2 == 0) {
           api.setVisible(`Seg${i + 1}y${i + 2}`, true);
-          api.setCaption(`Seg${i + 1}y${i + 2}`, `Restriccion ${(i / 2) + 1}`);
+          api.setCaption(`Seg${i + 1}y${i + 2}`, `Restricción ${(i / 2) + 1}`);
           api.setLabelVisible(`Seg${i + 1}y${i + 2}`, true);
           api.setLabelStyle(`Seg${i + 1}y${i + 2}`, 3);
           api.setLayer(`Seg${i + 1}y${i + 2}`, 0);
@@ -215,7 +216,7 @@ graficar = () => {
         const cantidad = parseFloat(obj.cantidad);
         return cantidad < min.cantidad ? { ...obj } : { ...min };
       });
-      console.log(valor);
+      //console.log(valor);
 
 
 
@@ -228,7 +229,7 @@ graficar = () => {
       // Crear el elemento tabla
       const tabla = document.createElement('table');
       tabla.classList.add('table', 'table-striped');
-
+      tabla.style.border = "1px solid";
       // Crear el elemento cabecera
       const cabecera = document.createElement('thead');
       const filaCabecera = document.createElement('tr');
@@ -270,7 +271,7 @@ graficar = () => {
         celdaCoordenadas.textContent = `${dato.x}, ${dato.y}`;
 
         const celdaEvaluacion = document.createElement('td');
-        celdaEvaluacion.textContent = `${coeficienteX}(${Number(valor[indice].x)}) ${signo == '+' ? '+' : '-'}${coeficienteY}(${valor[indice].y}) = ${(signo == '+' ? coeficienteX * valor[indice].x + coeficienteY * valor[indice].y : coeficienteX * valor[indice].x - coeficienteY * valor[indice].y).toFixed(2)}`;
+        celdaEvaluacion.innerHTML = `${coeficienteX}(${Number(valor[indice].x)}) ${signo == '+' ? '+' : '-'}${coeficienteY}(${valor[indice].y}) = <strong> ${(signo == '+' ? coeficienteX * valor[indice].x + coeficienteY * valor[indice].y : coeficienteX * valor[indice].x - coeficienteY * valor[indice].y).toFixed(2)}</strong>`;
 
         // Agregar las celdas a la fila
         fila.appendChild(celdaPunto);
@@ -296,31 +297,31 @@ graficar = () => {
       let alerta = document.createElement("div");
       alerta.classList.add("alert", "alert-success");
       let header4 = document.createElement("h4");
-      header4.textContent = "Solucion optima";
+      header4.textContent = "Solución óptima";
       alerta.appendChild(header4);
       let parr = document.createElement("p");
       let contexto = document.createElement("p");
       let arreglo = [];
-      console.log(registro_mayor_cantidad, registro_menor_cantidad, signo);
-      if (objetivo==1) {
+      //console.log(registro_mayor_cantidad, registro_menor_cantidad, signo);
+      if (objetivo == 1) {
         arreglo.push(valor[registro_mayor_cantidad.index - 1].x)
         arreglo.push(valor[registro_mayor_cantidad.index - 1].y);
-        if(signo == '+')
-        parr.textContent = `La solución óptima es Z = ${(coeficienteX * arreglo[0] + coeficienteY * arreglo[1]).toFixed(2)}`;
+        if (signo == '+')
+          parr.innerHTML = `La solución óptima es Z = <strong> ${(coeficienteX * arreglo[0] + coeficienteY * arreglo[1]).toFixed(2)}</strong>`;
         else
-        parr.textContent = `La solución óptima es Z = ${(coeficienteX * arreglo[0] - coeficienteY * arreglo[1]).toFixed(2)}`;
+          parr.innerHTML = `La solución óptima es Z = <strong> ${(coeficienteX * arreglo[0] - coeficienteY * arreglo[1]).toFixed(2)}</strong>`;
 
       } else {
         arreglo.push(valor[registro_menor_cantidad.index - 1].x)
         arreglo.push(valor[registro_menor_cantidad.index - 1].y);
-        if(signo == '-')
-        parr.textContent = `La solución óptima es Z = ${(coeficienteX * arreglo[0] - coeficienteY * arreglo[1]).toFixed(2)}`;
+        if (signo == '-')
+          parr.textContent = `La solución óptima es Z = <strong>${(coeficienteX * arreglo[0] - coeficienteY * arreglo[1]).toFixed(2)}</strong>`;
         else
-        parr.textContent = `La solución óptima es Z = ${(coeficienteX * arreglo[0] + coeficienteY * arreglo[1]).toFixed(2)}`;
+          parr.textContent = `La solución óptima es Z = <strong>${(coeficienteX * arreglo[0] + coeficienteY * arreglo[1]).toFixed(2)}</strong>`;
       }
       alerta.appendChild(parr);
       alerta.appendChild(document.createElement("hr"));
-      contexto.textContent = `Se obtiene con los valores X = ${arreglo[0]} y Y = ${arreglo[1]}`;
+      contexto.innerHTML = `Se obtiene con los valores <u>X = ${arreglo[0]}</u> y <u>Y = ${arreglo[1]}</u>`;
       alerta.appendChild(contexto);
       contenedor.appendChild(alerta);
 
@@ -437,7 +438,7 @@ validar = () => {
   }
   return true;
 }
-validarObjetivo = () =>{
+validarObjetivo = () => {
   let re = /^\d*\.?\d+x\s*[+-]\s*\d*\.?\d+y$/i;
   return re.test(document.getElementById("funcion-objetivo").value);
 }
