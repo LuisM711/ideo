@@ -449,7 +449,7 @@ reconocerInecuacion = (str) => {
 }
 limpiar = () => {
   let totalRestricciones = document.getElementById("restricciones").childElementCount;
-  for (let i = 1; i < totalRestricciones; i++) {
+  for (let i = 1; i < totalRestricciones+1; i++) {
     document.getElementById(`restriccion${i}`).value = "";
   }
   document.getElementById("funcion-objetivo").value = "";
