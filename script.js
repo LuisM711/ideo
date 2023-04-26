@@ -432,7 +432,7 @@ avisoError = (mensaje = "") => {
 }
 validar = () => {
   let totalRestricciones = document.getElementById("restricciones").childElementCount;
-  for (let i = 1; i < totalRestricciones; i++) {
+  for (let i = 1; i < totalRestricciones+1; i++) {
     if (document.getElementById(`restriccion${i}`).value == "") return false;
     if (!reconocerInecuacion(document.getElementById(`restriccion${i}`).value)) return false;
   }
@@ -444,7 +444,9 @@ validarObjetivo = () => {
 }
 reconocerInecuacion = (str) => {
   //var re = /^(-?\d*\.?\d+|\d*[a-z]|\d+)\s*[+]\s*(-?\d*\.?\d+|\d*[a-z]|\d+)\s*([<>]?=)\s*(-?\d*\.?\d+)$/;
-  let re = /^\d*(?:\.\d+)?x\s*[+-]\s*\d*(?:\.\d+)?y\s*(?:>=|<=)\s*\d*(?:\.\d+)?$/i;
+  let re = /^\d*(?:\.\d+)?x\s*[+-]\s*\d*(?:\.\d+)?y\s*(?:<=|>=)\s*\d*(?:\.\d+)?$/i
+
+  ;
   return re.test(str);
 }
 limpiar = () => {
