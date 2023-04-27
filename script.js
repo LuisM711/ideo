@@ -39,7 +39,7 @@ agregarRestriccion = () => {
   let numRestricciones = restricciones.childElementCount;
   numRestricciones++;
   let nuevaRestriccion = document.createElement("div");
-  nuevaRestriccion.style.display = "inline-block";
+  //nuevaRestriccion.style.display = "inline-block";
   nuevaRestriccion.classList.add("rest");
   // nuevaRestriccion.innerHTML = `
   //     <label for="restriccion${numRestricciones}">
@@ -48,7 +48,7 @@ agregarRestriccion = () => {
   //     <input type="text" id="restriccion${numRestricciones}" class="" name="restriccion${numRestricciones}">
   //   `;
   nuevaRestriccion.innerHTML = `
-      <input type="text" id = "x_${numRestricciones}" class = 'form-input' onclick="this.select();">x 
+      <p>Restricción ${numRestricciones}:</p> <input type="text" id = "x_${numRestricciones}" class = 'form-input' onclick="this.select();">x 
       <select id ="signo_${numRestricciones}" class = "form-select fit">
       <option value = "1">+</option>
       <option value = "2">-</option>
@@ -96,10 +96,10 @@ graficar = () => {
   document.getElementById("todo").hidden = true;
   if (validar()) document.getElementById("todo").hidden = false;
   else {
-    avisoError("Hubo un error en los datos, verifique sus entradas y vuelva a intentar"); return false;
+    avisoError("Hubo un error en los datos, verifique sus entradas y vuelva a intentar."); return false;
   }
   if (!validarObjetivo()) {
-    avisoError("Hubo un error en los datos, verifique sus entradas y vuelva a intentar");
+    avisoError("Hubo un error en los datos, verifique sus entradas y vuelva a intentar.");
     document.getElementById("todo").hidden = true;
     return false;
 
