@@ -91,7 +91,7 @@ convertirIgual = (restriccion = "") => {
   else console.log("error inecuacion");
 }
 graficar = () => {
-  
+
   document.getElementById("aviso").innerHTML = "";
   document.getElementById("todo").hidden = true;
   if (validar()) document.getElementById("todo").hidden = false;
@@ -159,7 +159,7 @@ graficar = () => {
       //console.log(api.getValueString(nombrePuntos[0]));
       //let valor = api.evalCommandCAS(nombrePuntos[0]);
 
-      
+
       for (let i = 0; i < nombrePuntos.length; i++) {
         let valor = (`${api.getValueString(nombrePuntos[i])}`.split('='));
         //console.log(valor);
@@ -171,20 +171,20 @@ graficar = () => {
       let ymax = 0;
       restricciones.forEach((value, index) => {
         //console.log(index,value);
-        if (restricciones[index][0].x > xmax && restricciones[index][0].x != Infinity) xmax = restricciones[index][0].x;
-        if (restricciones[index][1].x > xmax && restricciones[index][1].x != Infinity) xmax = restricciones[index][1].x;
+        if (restricciones[index][0].x > xmax && restricciones[index][0].x != Infinity && !isNaN(restricciones[index][0].x)) xmax = restricciones[index][0].x;
+        if (restricciones[index][1].x > xmax && restricciones[index][1].x != Infinity && !isNaN(restricciones[index][1].x)) xmax = restricciones[index][1].x;
 
-        if (restricciones[index][0].y > ymax && restricciones[index][0].y != Infinity) ymax = restricciones[index][0].y;
-        if (restricciones[index][1].y > ymax && restricciones[index][1].y != Infinity) ymax = restricciones[index][1].y;
+        if (restricciones[index][0].y > ymax && restricciones[index][0].y != Infinity && !isNaN(restricciones[index][0].y)) ymax = restricciones[index][0].y;
+        if (restricciones[index][1].y > ymax && restricciones[index][1].y != Infinity && !isNaN(restricciones[index][1].y)) ymax = restricciones[index][1].y;
 
       });
-      
-      console.log(xmax,ymax);
-      xmax += xmax*.20;
-      ymax += ymax*.20;
-      let xmin = -xmax/10;
-      ymin = -ymax/10;
-      console.log(xmax,ymax);
+
+      console.log(xmax, ymax);
+      xmax += xmax * .20;
+      ymax += ymax * .20;
+      let xmin = -xmax / 10;
+      ymin = -ymax / 10;
+      console.log(xmax, ymax);
       api.setCoordSystem(xmin, xmax, ymin, ymax);
 
 
@@ -221,7 +221,6 @@ graficar = () => {
           api.setLabelVisible(`Seg${i + 1}y${i + 2}`, true);
           api.setLabelStyle(`Seg${i + 1}y${i + 2}`, 3);
           api.setLayer(`Seg${i + 1}y${i + 2}`, 0);
-          //api.setColor(`Seg${i + 1}y${i + 2}`, 0,255,0);
         }
       }
       api.setLabelVisible('regionFactible', false);
@@ -419,19 +418,34 @@ graficar = () => {
   }, 'ggbApplet');
   let codigoGeoGebra = "";
   let c = 0;
-  //debugger;
+
   restricciones.forEach((value, index) => {
+    if (isNaN(restricciones[index][0].x) || isNaN(restricciones[index][0].y) || isNaN(restricciones[index][1].x) || isNaN(restricciones[index][1].y)) {
+      codigoGeoGebra += `Seg${c + 1}y${c + 2} = (${convertirIgual(arregloInecuaciones[index])})`;
+      codigoGeoGebra += "\n";
+      if (!isNaN(restricciones[index][0].x)) {
+        codigoGeoGebra += `Punto${c + 1} = Intersect(Seg${c + 1}y${c + 2},y = 0)`;
+      }
+      else if (!isNaN(restricciones[index][0].y))
+        codigoGeoGebra += `Punto${c + 1} = Intersect(Seg${c + 1}y${c + 2},x = 0)`;
+      else if (!isNaN(restricciones[index][1].x))
+        codigoGeoGebra += `Punto${c + 1} = Intersect(Seg${c + 1}y${c + 2},y = 0)`;
+      else if (!isNaN(restricciones[index][1].y))
+        codigoGeoGebra += `Punto${c + 1} = Intersect(Seg${c + 1}y${c + 2},x = 0)`;
+      codigoGeoGebra += "\n";
+    } else {
 
 
-    codigoGeoGebra += `Punto${c + 1} = Intersect(x=${restricciones[index][0].x}, y = ${restricciones[index][0].y})`;
-    codigoGeoGebra += "\n";
-    codigoGeoGebra += `Punto${c + 2} = Intersect(x=${restricciones[index][1].x}, y = ${restricciones[index][1].y})`;
-    codigoGeoGebra += "\n";
-    codigoGeoGebra += `Seg${c + 1}y${c + 2} = Segment(Punto${c + 1},Punto${c + 2})`;
-    codigoGeoGebra += "\n";
+      codigoGeoGebra += `Punto${c + 1} = Intersect(x=${restricciones[index][0].x}, y = ${restricciones[index][0].y})`;
+      codigoGeoGebra += "\n";
+      codigoGeoGebra += `Punto${c + 2} = Intersect(x=${restricciones[index][1].x}, y = ${restricciones[index][1].y})`;
+      codigoGeoGebra += "\n";
+      codigoGeoGebra += `Seg${c + 1}y${c + 2} = Segment(Punto${c + 1},Punto${c + 2})`;
+      codigoGeoGebra += "\n";
 
-
+    }
     c += 2;
+
   });
   //debugger;
   let arr = [];
