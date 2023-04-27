@@ -2,10 +2,33 @@ onload = (event) => {
   agregarRestriccion();
   agregarRestriccion();
   agregarRestriccion();
-  document.getElementById("funcion-objetivo").value = "40x+50y";
-  document.getElementById("restriccion1").value = "125x+200y<=5000";
-  document.getElementById("restriccion2").value = "150x+100y<=3000";
-  document.getElementById("restriccion3").value = "67x+25y<=1000";
+  // document.getElementById("funcion-objetivo").value = "40x+50y";
+  // document.getElementById("restriccion1").value = "125x+200y<=5000";
+  // document.getElementById("restriccion2").value = "150x+100y<=3000";
+  // document.getElementById("restriccion3").value = "67x+25y<=1000";
+  document.getElementById("coeficienteXObjetivo").value = "40";
+  document.getElementById("signoObjetivo").value = "1";
+  document.getElementById("coeficienteYObjetivo").value = "50";
+
+  document.getElementById("x_1").value = "125";
+  document.getElementById("signo_1").value = "1";
+  document.getElementById("y_1").value = "200";
+  document.getElementById("tipoInecuacion_1").value = "2";
+  document.getElementById("constante_1").value = "5000";
+
+  document.getElementById("x_2").value = "150";
+  document.getElementById("signo_2").value = "1";
+  document.getElementById("y_2").value = "100";
+  document.getElementById("tipoInecuacion_2").value = "2";
+  document.getElementById("constante_2").value = "3000";
+
+  document.getElementById("x_3").value = "67";
+  document.getElementById("signo_3").value = "1";
+  document.getElementById("y_3").value = "25";
+  document.getElementById("tipoInecuacion_3").value = "2";
+  document.getElementById("constante_3").value = "1000";
+  console.log(getObjetivo());
+  console.log(getRestricciones());
 }
 
 
@@ -16,12 +39,28 @@ agregarRestriccion = () => {
   let numRestricciones = restricciones.childElementCount;
   numRestricciones++;
   let nuevaRestriccion = document.createElement("div");
+  nuevaRestriccion.style.display = "inline-block";
+  nuevaRestriccion.classList.add("rest");
+  // nuevaRestriccion.innerHTML = `
+  //     <label for="restriccion${numRestricciones}">
+  //       Restricción ${numRestricciones}:
+  //     </label>
+  //     <input type="text" id="restriccion${numRestricciones}" class="" name="restriccion${numRestricciones}">
+  //   `;
   nuevaRestriccion.innerHTML = `
-      <label for="restriccion${numRestricciones}">
-        Restricción ${numRestricciones}:
-      </label>
-      <input type="text" id="restriccion${numRestricciones}" class="" name="restriccion${numRestricciones}">
-    `;
+      <input type="text" id = "x_${numRestricciones}" class = 'form-input' onclick="this.select();">x 
+      <select id ="signo_${numRestricciones}" class = "form-select fit">
+      <option value = "1">+</option>
+      <option value = "2">-</option>
+      </select>
+      <input type="text" id = "y_${numRestricciones}" class = 'form-input' onclick="this.select();"">y
+      <select id ="tipoInecuacion_${numRestricciones}" class = "form-select fit">
+      <option value = "1">>=</option>
+      <option value = "2"><=</option>
+      <option value = "3">=</option>
+      </select>
+      <input type="text" id = "constante_${numRestricciones}" class = 'form-input' onclick="this.select();">
+      `;
   restricciones.appendChild(nuevaRestriccion);
 }
 quitarRestriccion = () => {
@@ -52,14 +91,15 @@ convertirIgual = (restriccion = "") => {
   else console.log("error inecuacion");
 }
 graficar = () => {
+  
   document.getElementById("aviso").innerHTML = "";
   document.getElementById("todo").hidden = true;
   if (validar()) document.getElementById("todo").hidden = false;
   else {
-    avisoError("Hubo un error en los datos"); return false;
+    avisoError("Hubo un error en los datos, verifique sus entradas y vuelva a intentar"); return false;
   }
   if (!validarObjetivo()) {
-    avisoError("Hubo un error en la función objetivo");
+    avisoError("Hubo un error en los datos, verifique sus entradas y vuelva a intentar");
     document.getElementById("todo").hidden = true;
     return false;
 
@@ -67,10 +107,9 @@ graficar = () => {
   var objetivo = parseInt(document.getElementById("objetivo").value);
   var restriccionesInputs = document.querySelectorAll("#restricciones input");
   var restricciones = [];
-  let arregloInecuaciones = [];
-  for (var i = 0; i < restriccionesInputs.length; i++) {
-    arregloInecuaciones.push(restriccionesInputs[i].value);
-    var restriccion = convertirIgual(restriccionesInputs[i].value);
+  let arregloInecuaciones = getRestricciones();
+  for (let i = 0; i < arregloInecuaciones.length; i++) {
+    var restriccion = convertirIgual(arregloInecuaciones[i]);
     if (restriccion) {
       restricciones.push(calcularPuntos(restriccion));
     }
@@ -84,8 +123,9 @@ graficar = () => {
     "showToolBar": false,
     "showMenuBar": false,
     "showAlgebraInput": false,
-    "allowUpscale": false,
-    // "enableLabelDrags": true,
+    "enableShiftDragZoom": false,
+    //"allowUpscale": false,
+    "enableLabelDrags": false,
     // "enableShiftDragZoom": true,
     // "capturingThreshold": null,
     // "borderColor": null,
@@ -103,7 +143,7 @@ graficar = () => {
     // "showFullscreenButton":false,
     // "showSuggestionButtons":false,
     appletOnLoad(api) {
-      api.setRounding("5");
+      api.setRounding("2");
       api.evalCommand(codigoGeoGebra);
       api.setGridVisible(1);
       //api.writePNGtoFile("SoluciÃ³n.png", 1, !1, 144);
@@ -118,6 +158,8 @@ graficar = () => {
       }//console.log(nombrePuntos);
       //console.log(api.getValueString(nombrePuntos[0]));
       //let valor = api.evalCommandCAS(nombrePuntos[0]);
+
+      
       for (let i = 0; i < nombrePuntos.length; i++) {
         let valor = (`${api.getValueString(nombrePuntos[i])}`.split('='));
         //console.log(valor);
@@ -136,17 +178,27 @@ graficar = () => {
         if (restricciones[index][1].y > ymax && restricciones[index][1].y != Infinity) ymax = restricciones[index][1].y;
 
       });
-      //console.log(xmax, ymax);
-      api.setCoordSystem(-5, xmax + 5, -5, ymax + 5);
+      
+      console.log(xmax,ymax);
+      xmax += xmax*.20;
+      ymax += ymax*.20;
+      let xmin = -xmax/10;
+      ymin = -ymax/10;
+      console.log(xmax,ymax);
+      api.setCoordSystem(xmin, xmax, ymin, ymax);
+
+
       let codigo = "";
       api.deleteObject("Punto_{2}");
       let count = 0;
+
       for (count = 0; count < puntosConLasMismasCoordenadas.length; count++) {
         //codigo+=`PuntoRF${i+1} = Intersect(x=${puntosConLasMismasCoordenadas[i].x},y=${puntosConLasMismasCoordenadas[i].y})`;
         codigo += `${letrasMayusculas[count]} = Intersect(x=${puntosConLasMismasCoordenadas[count].x},y=${puntosConLasMismasCoordenadas[count].y})`;
 
         codigo += "\n";
       }
+
       api.evalCommand(codigo);
       for (count = 0; count < puntosConLasMismasCoordenadas.length; count++) {
         api.setCaption(`${letrasMayusculas[count]}`, "Hola");
@@ -175,7 +227,7 @@ graficar = () => {
       api.setLabelVisible('regionFactible', false);
       api.setTextValue('regionFactible', "Region factible");
       //api.setPointSize('A',8);
-      let funcion_objetivo = document.getElementById("funcion-objetivo").value;
+      let funcion_objetivo = getObjetivo();
       let coeficienteX = 0;
       let coeficienteY = 0;
       let signo = '';
@@ -315,9 +367,9 @@ graficar = () => {
         arreglo.push(valor[registro_menor_cantidad.index - 1].x)
         arreglo.push(valor[registro_menor_cantidad.index - 1].y);
         if (signo == '-')
-          parr.textContent = `La solución óptima es Z = <strong>${(coeficienteX * arreglo[0] - coeficienteY * arreglo[1]).toFixed(2)}</strong>`;
+          parr.innerHTML = `La solución óptima es Z = <strong>${(coeficienteX * arreglo[0] - coeficienteY * arreglo[1]).toFixed(2)}</strong>`;
         else
-          parr.textContent = `La solución óptima es Z = <strong>${(coeficienteX * arreglo[0] + coeficienteY * arreglo[1]).toFixed(2)}</strong>`;
+          parr.innerHTML = `La solución óptima es Z = <strong>${(coeficienteX * arreglo[0] + coeficienteY * arreglo[1]).toFixed(2)}</strong>`;
       }
       alerta.appendChild(parr);
       alerta.appendChild(document.createElement("hr"));
@@ -336,26 +388,24 @@ graficar = () => {
 
 
 
-
+      //COLOREAR PUNTO OPTIMO
       if (objetivo === 1) {
-        api.setColor(letrasMayusculas[registro_mayor_cantidad.index - 1], 255, 0, 0);
-        api.setPointSize(letrasMayusculas[registro_mayor_cantidad.index - 1], 9);
-        api.setLineThickness(letrasMayusculas[registro_mayor_cantidad.index - 1], 10);
+        //api.setColor(letrasMayusculas[registro_mayor_cantidad.index - 1], 255, 0, 0);
+        //api.setPointSize(letrasMayusculas[registro_mayor_cantidad.index - 1], 9);
+        //api.setLineThickness(letrasMayusculas[registro_mayor_cantidad.index - 1], 10);
         marcarFila(registro_mayor_cantidad.index - 1);
         evaluacion.innerHTML += `<h3>Solución óptima: x = ${puntosConLasMismasCoordenadas[registro_mayor_cantidad.index - 1].x}, y = ${puntosConLasMismasCoordenadas[registro_mayor_cantidad.index - 1].y} = ${registro_mayor_cantidad.cantidad}</h3>`;
 
       }
       else if (objetivo === 2) {
-        api.setColor(letrasMayusculas[registro_menor_cantidad.index - 1], 255, 0, 0);
-        api.setPointSize(letrasMayusculas[registro_menor_cantidad.index - 1], 9);
-        api.setLineThickness(letrasMayusculas[registro_menor_cantidad.index - 1], 10);
+        // api.setColor(letrasMayusculas[registro_menor_cantidad.index - 1], 255, 0, 0);
+        //api.setPointSize(letrasMayusculas[registro_menor_cantidad.index - 1], 9);
+        //api.setLineThickness(letrasMayusculas[registro_menor_cantidad.index - 1], 10);
         marcarFila(registro_menor_cantidad.index - 1);
         evaluacion.innerHTML += `<h3>Solución óptima: x = ${puntosConLasMismasCoordenadas[registro_menor_cantidad.index - 1].x}, y = ${puntosConLasMismasCoordenadas[registro_menor_cantidad.index - 1].y} = ${registro_menor_cantidad.cantidad}</h3>`;
 
       }
-      else {
 
-      }
       document.getElementById("evaluacion").innerHTML = "";
       if (flag)
         document.getElementById("tabla").hidden = false;
@@ -369,7 +419,7 @@ graficar = () => {
   }, 'ggbApplet');
   let codigoGeoGebra = "";
   let c = 0;
-
+  //debugger;
   restricciones.forEach((value, index) => {
 
 
@@ -383,9 +433,16 @@ graficar = () => {
 
     c += 2;
   });
+  //debugger;
+  let arr = [];
   codigoGeoGebra += "regionFactible = ("
   for (let i = 0; i < arregloInecuaciones.length; i++) {
-    codigoGeoGebra += arregloInecuaciones[i] + "∧";
+    if (getInecuacion(arregloInecuaciones[i]) != "=")
+      codigoGeoGebra += arregloInecuaciones[i] + "∧";
+    else {
+      arr = conversionDeIgual(arregloInecuaciones[i]);
+      codigoGeoGebra += arr[0] + "∧" + arr[1] + "∧";
+    }
   }
   codigoGeoGebra += "x>=0∧y>=0)";
   //codigoGeoGebra += "Vertex(regionFactible)";
@@ -431,32 +488,79 @@ avisoError = (mensaje = "") => {
   DOMaviso.appendChild(aviso);
 }
 validar = () => {
-  let totalRestricciones = document.getElementById("restricciones").childElementCount;
-  for (let i = 1; i < totalRestricciones; i++) {
-    if (document.getElementById(`restriccion${i}`).value == "") return false;
-    if (!reconocerInecuacion(document.getElementById(`restriccion${i}`).value)) return false;
+  let rest = getRestricciones();
+  for (let i = 1; i < rest.length; i++) {
+    if ((rest[i]) == "") return false;
+    if (!reconocerInecuacion(rest[i])) return false;
   }
   return true;
 }
 validarObjetivo = () => {
   let re = /^\d*\.?\d+x\s*[+-]\s*\d*\.?\d+y$/i;
-  return re.test(document.getElementById("funcion-objetivo").value);
+  return re.test(getObjetivo());
 }
 reconocerInecuacion = (str) => {
   //var re = /^(-?\d*\.?\d+|\d*[a-z]|\d+)\s*[+]\s*(-?\d*\.?\d+|\d*[a-z]|\d+)\s*([<>]?=)\s*(-?\d*\.?\d+)$/;
-  let re = /^\d*(?:\.\d+)?x\s*[+-]\s*\d*(?:\.\d+)?y\s*(?:>=|<=)\s*\d*(?:\.\d+)?$/i;
+  let re = /^\d*(?:\.\d+)?x\s*[+-]\s*\d*(?:\.\d+)?y\s*(?:<=|>=|=)\s*\d*(?:\.\d+)?$/i;
   return re.test(str);
 }
 limpiar = () => {
-  let totalRestricciones = document.getElementById("restricciones").childElementCount;
-  for (let i = 1; i < totalRestricciones; i++) {
-    document.getElementById(`restriccion${i}`).value = "";
+  // let totalRestricciones = document.getElementById("restricciones").childElementCount;
+  // for (let i = 1; i < totalRestricciones + 1; i++) {
+  //   document.getElementById(`restriccion${i}`).value = "";
+  // }
+  // document.getElementById("funcion-objetivo").value = "";
+  // document.getElementById("objetivo").value = "1";
+  // document.getElementById("todo").hidden = true;
+  document.getElementById("coeficienteXObjetivo").value = "";
+  document.getElementById("signoObjetivo").value = "1";
+  document.getElementById("coeficienteYObjetivo").value = "";
+  for (let i = 1; i <= document.getElementById("restricciones").childElementCount; i++) {
+    document.getElementById(`x_${i}`).value = "";
+    document.getElementById(`signo_${i}`).value = "1";
+    document.getElementById(`y_${i}`).value = "";
+    document.getElementById(`tipoInecuacion_${i}`).value = "2";
+    document.getElementById(`constante_${i}`).value = "";
   }
-  document.getElementById("funcion-objetivo").value = "";
-  document.getElementById("objetivo").value = "1";
-  document.getElementById("todo").hidden = true;
+
 }
 marcarFila = (index) => {
   const filas = document.querySelectorAll('tbody tr');
   filas[index].classList.add('marcada');
+}
+getInecuacion = (restriccion = "") => {
+  if (restriccion.includes("<=")) return "<=";
+  else if (restriccion.includes(">=")) return ">=";
+  else if (restriccion.includes("<=")) return "<=";
+  else if (restriccion.includes("=")) return "=";
+  else console.log("error inecuacion");
+}
+conversionDeIgual = (restriccion = "") => {
+  if (restriccion.includes("=")) return [restriccion.replace("=", ">="), restriccion.replace("=", "<=")];
+  else console.log("error inecuacion");
+}
+getObjetivo = () => {
+  let obj = "";
+  obj += document.getElementById("coeficienteXObjetivo").value;
+  obj += 'x';
+  obj += document.getElementById("signoObjetivo").options[document.getElementById("signoObjetivo").selectedIndex].text;
+  obj += document.getElementById("coeficienteYObjetivo").value;
+  obj += 'y';
+  return obj;
+}
+getRestricciones = () => {
+  let rest = [];
+  let aux;
+  for (let i = 1; i <= document.getElementById("restricciones").childElementCount; i++) {
+    aux = "";
+    aux += document.getElementById(`x_${i}`).value;
+    aux += 'x';
+    aux += document.getElementById(`signo_${i}`).options[document.getElementById(`signo_${i}`).selectedIndex].text;
+    aux += document.getElementById(`y_${i}`).value;
+    aux += 'y';
+    aux += document.getElementById(`tipoInecuacion_${i}`).options[document.getElementById(`tipoInecuacion_${i}`).selectedIndex].text;
+    aux += document.getElementById(`constante_${i}`).value;
+    rest.push(aux);
+  }
+  return rest;
 }
