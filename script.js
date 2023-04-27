@@ -158,8 +158,6 @@ graficar = () => {
       }//console.log(nombrePuntos);
       //console.log(api.getValueString(nombrePuntos[0]));
       //let valor = api.evalCommandCAS(nombrePuntos[0]);
-
-      
       for (let i = 0; i < nombrePuntos.length; i++) {
         let valor = (`${api.getValueString(nombrePuntos[i])}`.split('='));
         //console.log(valor);
@@ -178,16 +176,8 @@ graficar = () => {
         if (restricciones[index][1].y > ymax && restricciones[index][1].y != Infinity) ymax = restricciones[index][1].y;
 
       });
-      
-      console.log(xmax,ymax);
-      xmax += xmax*.20;
-      ymax += ymax*.20;
-      let xmin = -xmax/10;
-      ymin = -ymax/10;
-      console.log(xmax,ymax);
-      api.setCoordSystem(xmin, xmax, ymin, ymax);
-
-
+      //console.log(xmax, ymax);
+      api.setCoordSystem(-5, xmax + 5, -5, ymax + 5);
       let codigo = "";
       api.deleteObject("Punto_{2}");
       let count = 0;
@@ -437,12 +427,7 @@ graficar = () => {
   let arr = [];
   codigoGeoGebra += "regionFactible = ("
   for (let i = 0; i < arregloInecuaciones.length; i++) {
-    if (getInecuacion(arregloInecuaciones[i]) != "=")
-      codigoGeoGebra += arregloInecuaciones[i] + "∧";
-    else {
-      arr = conversionDeIgual(arregloInecuaciones[i]);
-      codigoGeoGebra += arr[0] + "∧" + arr[1] + "∧";
-    }
+    codigoGeoGebra += arregloInecuaciones[i] + "∧";
   }
   codigoGeoGebra += "x>=0∧y>=0)";
   //codigoGeoGebra += "Vertex(regionFactible)";
@@ -488,10 +473,10 @@ avisoError = (mensaje = "") => {
   DOMaviso.appendChild(aviso);
 }
 validar = () => {
-  let rest = getRestricciones();
-  for (let i = 1; i < rest.length; i++) {
-    if ((rest[i]) == "") return false;
-    if (!reconocerInecuacion(rest[i])) return false;
+  let totalRestricciones = document.getElementById("restricciones").childElementCount;
+  for (let i = 1; i < totalRestricciones; i++) {
+    if (document.getElementById(`restriccion${i}`).value == "") return false;
+    if (!reconocerInecuacion(document.getElementById(`restriccion${i}`).value)) return false;
   }
   return true;
 }
@@ -501,66 +486,17 @@ validarObjetivo = () => {
 }
 reconocerInecuacion = (str) => {
   //var re = /^(-?\d*\.?\d+|\d*[a-z]|\d+)\s*[+]\s*(-?\d*\.?\d+|\d*[a-z]|\d+)\s*([<>]?=)\s*(-?\d*\.?\d+)$/;
-  let re = /^\d*(?:\.\d+)?x\s*[+-]\s*\d*(?:\.\d+)?y\s*(?:<=|>=|=)\s*\d*(?:\.\d+)?$/i;
+  let re = /^\d*(?:\.\d+)?x\s*[+-]\s*\d*(?:\.\d+)?y\s*(?:>=|<=)\s*\d*(?:\.\d+)?$/i;
   return re.test(str);
 }
 limpiar = () => {
-  // let totalRestricciones = document.getElementById("restricciones").childElementCount;
-  // for (let i = 1; i < totalRestricciones + 1; i++) {
-  //   document.getElementById(`restriccion${i}`).value = "";
-  // }
-  // document.getElementById("funcion-objetivo").value = "";
-  // document.getElementById("objetivo").value = "1";
-  // document.getElementById("todo").hidden = true;
-  document.getElementById("coeficienteXObjetivo").value = "";
-  document.getElementById("signoObjetivo").value = "1";
-  document.getElementById("coeficienteYObjetivo").value = "";
-  for (let i = 1; i <= document.getElementById("restricciones").childElementCount; i++) {
-    document.getElementById(`x_${i}`).value = "";
-    document.getElementById(`signo_${i}`).value = "1";
-    document.getElementById(`y_${i}`).value = "";
-    document.getElementById(`tipoInecuacion_${i}`).value = "2";
-    document.getElementById(`constante_${i}`).value = "";
+  let totalRestricciones = document.getElementById("restricciones").childElementCount;
+  for (let i = 1; i < totalRestricciones; i++) {
+    document.getElementById(`restriccion${i}`).value = "";
   }
 
 }
 marcarFila = (index) => {
   const filas = document.querySelectorAll('tbody tr');
   filas[index].classList.add('marcada');
-}
-getInecuacion = (restriccion = "") => {
-  if (restriccion.includes("<=")) return "<=";
-  else if (restriccion.includes(">=")) return ">=";
-  else if (restriccion.includes("<=")) return "<=";
-  else if (restriccion.includes("=")) return "=";
-  else console.log("error inecuacion");
-}
-conversionDeIgual = (restriccion = "") => {
-  if (restriccion.includes("=")) return [restriccion.replace("=", ">="), restriccion.replace("=", "<=")];
-  else console.log("error inecuacion");
-}
-getObjetivo = () => {
-  let obj = "";
-  obj += document.getElementById("coeficienteXObjetivo").value;
-  obj += 'x';
-  obj += document.getElementById("signoObjetivo").options[document.getElementById("signoObjetivo").selectedIndex].text;
-  obj += document.getElementById("coeficienteYObjetivo").value;
-  obj += 'y';
-  return obj;
-}
-getRestricciones = () => {
-  let rest = [];
-  let aux;
-  for (let i = 1; i <= document.getElementById("restricciones").childElementCount; i++) {
-    aux = "";
-    aux += document.getElementById(`x_${i}`).value;
-    aux += 'x';
-    aux += document.getElementById(`signo_${i}`).options[document.getElementById(`signo_${i}`).selectedIndex].text;
-    aux += document.getElementById(`y_${i}`).value;
-    aux += 'y';
-    aux += document.getElementById(`tipoInecuacion_${i}`).options[document.getElementById(`tipoInecuacion_${i}`).selectedIndex].text;
-    aux += document.getElementById(`constante_${i}`).value;
-    rest.push(aux);
-  }
-  return rest;
 }
