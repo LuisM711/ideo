@@ -104,16 +104,20 @@ graficar = () => {
     return false;
 
   } else document.getElementById("todo").hidden = false;
-  var objetivo = parseInt(document.getElementById("objetivo").value);
-  var restriccionesInputs = document.querySelectorAll("#restricciones input");
-  var restricciones = [];
+  let objetivo = parseInt(document.getElementById("objetivo").value);
+  let restriccionesInputs = document.querySelectorAll("#restricciones input");
+  let restricciones = [];
+  let ecuacionesIgual = [];
   let arregloInecuaciones = getRestricciones();
   for (let i = 0; i < arregloInecuaciones.length; i++) {
-    var restriccion = convertirIgual(arregloInecuaciones[i]);
+    let restriccion = convertirIgual(arregloInecuaciones[i]);
     if (restriccion) {
       restricciones.push(calcularPuntos(restriccion));
+      ecuacionesIgual.push(convertirIgual(arregloInecuaciones[i]));
     }
   }
+  
+  console.log(ecuacionesIgual);
   arregloInecuaciones.push("x>=0");
   arregloInecuaciones.push("y>=0");
   var ggbApp = new GGBApplet({
@@ -167,24 +171,19 @@ graficar = () => {
         //console.log(listaPuntosRegionFactible);
       }
       const puntosConLasMismasCoordenadas = JSON.parse(encontrarCoincidencias(listaPuntosRegionFactible));
-      let xmax = 0;
-      let ymax = 0;
-      restricciones.forEach((value, index) => {
-        //console.log(index,value);
-        if (restricciones[index][0].x > xmax && restricciones[index][0].x != Infinity && !isNaN(restricciones[index][0].x)) xmax = restricciones[index][0].x;
-        if (restricciones[index][1].x > xmax && restricciones[index][1].x != Infinity && !isNaN(restricciones[index][1].x)) xmax = restricciones[index][1].x;
-
-        if (restricciones[index][0].y > ymax && restricciones[index][0].y != Infinity && !isNaN(restricciones[index][0].y)) ymax = restricciones[index][0].y;
-        if (restricciones[index][1].y > ymax && restricciones[index][1].y != Infinity && !isNaN(restricciones[index][1].y)) ymax = restricciones[index][1].y;
-
-      });
-
+      let maximos = encontrarValoresMaximos(ecuacionesIgual);
+      let xmax = maximos.max_x;
+      let ymax = maximos.max_y; 
       console.log(xmax, ymax);
       xmax += xmax * .20;
       ymax += ymax * .20;
       let xmin = -xmax / 10;
       ymin = -ymax / 10;
-      console.log(xmax, ymax);
+      if(xmax<0)xmax = ymax;
+      if(ymax<0)ymax = xmax;
+      if(xmin>0)xmin=-5;
+      if(ymin>0)ymin=-5;
+      console.log(xmin, xmax, ymin, ymax);
       api.setCoordSystem(xmin, xmax, ymin, ymax);
 
 
@@ -420,7 +419,7 @@ graficar = () => {
   let c = 0;
 
   restricciones.forEach((value, index) => {
-    if (isNaN(restricciones[index][0].x) || isNaN(restricciones[index][0].y) || isNaN(restricciones[index][1].x) || isNaN(restricciones[index][1].y)) {
+    if (isNaN(restricciones[index][0].x) || isNaN(restricciones[index][0].y) || isNaN(restricciones[index][1].x) || isNaN(restricciones[index][1].y) || restricciones[index][0].x==Infinity || restricciones[index][1].x==Infinity || restricciones[index][0].y==Infinity || restricciones[index][1].y==Infinity) {
       codigoGeoGebra += `Seg${c + 1}y${c + 2} = (${convertirIgual(arregloInecuaciones[index])})`;
       codigoGeoGebra += "\n";
       if (!isNaN(restricciones[index][0].x)) {
@@ -441,6 +440,8 @@ graficar = () => {
       codigoGeoGebra += `Punto${c + 2} = Intersect(x=${restricciones[index][1].x}, y = ${restricciones[index][1].y})`;
       codigoGeoGebra += "\n";
       codigoGeoGebra += `Seg${c + 1}y${c + 2} = Segment(Punto${c + 1},Punto${c + 2})`;
+//      codigoGeoGebra += `Seg${c + 1}y${c + 2} = (${convertirIgual(arregloInecuaciones[index])})`;
+
       codigoGeoGebra += "\n";
 
     }
@@ -577,4 +578,25 @@ getRestricciones = () => {
     rest.push(aux);
   }
   return rest;
+}
+encontrarValoresMaximos = (ecuaciones) => {
+  let max_x = -Infinity;
+  let max_y = -Infinity;
+
+  // Iterar sobre cada ecuación
+  for (let i = 0; i < ecuaciones.length; i++) {
+    const coeficientes = ecuaciones[i].match(/([-]?\d+)x\s*([-+]?\d+)y\s*=+\s*([-]?\d+)/);
+
+    const x = coeficientes[1] ? coeficientes[3] / coeficientes[1] : 0;
+    const y = coeficientes[2] ? coeficientes[3] / coeficientes[2] : 0;
+
+    if (x > max_x && x!==Infinity)
+      max_x = x;
+
+    if (y > max_y && y!==Infinity)
+      max_y = y;
+
+  }
+
+  return { max_x, max_y };
 }

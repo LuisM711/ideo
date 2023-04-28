@@ -233,7 +233,7 @@
       applet.isJavaInstalled = function () {
         return false;
       };
-      var fetchParametersFromApi = function (successCallback) {
+      var fetchParametersFromaplicacion = function (successCallback) {
         var onSuccess = function (text) {
           var jsonData = JSON.parse(text);
           var isGeoGebra = function (element) {
@@ -273,7 +273,7 @@
           : "www.geogebra.org";
         var path = "/materials/" + parameters.material_id + "?scope=basic";
         sendCorsRequest(
-          "https://" + host + "/api/proxy.php?path=" + encodeURIComponent(path),
+          "https://" + host + "/aplicacion/proxy.php?path=" + encodeURIComponent(path),
           onSuccess,
           onError
         );
@@ -510,7 +510,7 @@
             window.GGBT_spinner.attachSpinner(previewPositioner, "66%");
           }
           if (parseVersion(html5CodebaseVersion) >= 5) {
-            parameters.appletOnLoad = function (api) {
+            parameters.appletOnLoad = function (aplicacion) {
               var preview = appletElem.querySelector(".ggb_preview");
               if (preview) {
                 preview.parentNode.removeChild(preview);
@@ -521,7 +521,7 @@
               if (window.GGBT_wsf_view) {
                 $(window).trigger("resize");
               }
-              oriAppletOnload(api);
+              oriAppletOnload(aplicacion);
             };
             if (!preRendered) {
               previewPositioner.appendChild(previewContainer);
@@ -543,9 +543,9 @@
           appletScaler.style.display = "block";
           appletScaler.appendChild(article);
           appletElem.appendChild(appletScaler);
-          parameters.appletOnLoad = function (api) {
+          parameters.appletOnLoad = function (aplicacion) {
             applet.resize();
-            oriAppletOnload(api);
+            oriAppletOnload(aplicacion);
           };
         }
         function renderGGBElementWithParams(article, parameters) {
@@ -1002,7 +1002,7 @@
         }
       };
       if (parameters.material_id !== undefined) {
-        fetchParametersFromApi(continueInit);
+        fetchParametersFromaplicacion(continueInit);
       } else {
         continueInit();
       }
