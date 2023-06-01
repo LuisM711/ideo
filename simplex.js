@@ -114,13 +114,6 @@ class Interfaz {
       divEcuaciones.appendChild(div);
   }
   insertarTabla(pcostes, psolucion, matriz, indice, fase, vcostes, tabla) {
-    console.log(pcostes);
-    console.log(psolucion);
-    console.log(matriz);
-    console.log(indice);
-    console.log(fase);
-    console.log(vcostes);
-    console.log(tabla);
     const div = document.createElement("div");
     let contenido = "";
     (contenido +=
@@ -130,13 +123,14 @@ class Interfaz {
           : 0 == fase
             ? "<h3>Matriz Inicial</h3>"
             : "<h3>Matriz Segunda Fase</h3>"
-        : `<h3>Iteración ${indice}</h3>`),
+        // : `<h3>Iteración ${indice}</h3>`),
+        : ''),
       (contenido += `<div class="div-tabla"><table class="tabla-simplex table" id="tabla-simplex-${tabla}"><tbody><tr><th class="encabezado-tabla esquina-tabla">Tabla ${indice + 1
-        }</th><th class="encabezado-tabla">C<sub>j</sub></th>`);
+        }</th><th class="encabezado-tabla">Original</th>`);
     for (let i = 0; i < vcostes.length - 1; i++)
       contenido += `<td>${vcostes[i].toFraction()}</td>`;
     contenido +=
-      '<td></td></tr><tr><th class="encabezado-tabla">C<sub>b</sub></th><th class="encabezado-tabla">Base</th>';
+      '<td></td></tr><tr><th class="encabezado-tabla">Original</th><th class="encabezado-tabla">Base</th>';
     for (let i = 0; i < matriz[0].length; i++)
       contenido += `<th class="encabezado-tabla">${pcostes[i]}</th>`;
     for (let i = 0; i < matriz.length; i++)
@@ -159,7 +153,7 @@ class Interfaz {
     "error" === tipo
       ? div.classList.add("mensaje", "error")
       : "correcto" === tipo
-        ? div.classList.add("mensaje", "correcto")
+        ? div.classList.add("mensaje", "correcto", "alert", "alert-success")
         : div.classList.add("mensaje", "intermedio"),
       (div.innerHTML = `${mensaje}`),
       divResultados.appendChild(div);
@@ -746,7 +740,8 @@ function calcular(
             "pivote"
           ),
           interfazusuario.mostrarMensaje(
-            `<p>Ingresa la variable <strong>${entra}</strong> y sale de la base la variable <strong>${sale}</strong>. El elemento pivote es <strong>${pivote}</strong></p>`,
+            // `<p>Ingresa la variable <strong>${entra}</strong> y sale de la base la variable <strong>${sale}</strong>. El elemento pivote es <strong>${pivote}</strong></p>`,
+            `<p>El elemento pivote es <strong>${pivote}</strong></p>`,
             "intermedio"
           ),
           indice++,
@@ -793,7 +788,8 @@ function calcular(
           const columnapivote = problema.varEntrante(maxminSeleccionado),
             entra = problema.posicion_costes[columnapivote];
           interfazusuario.mostrarMensaje(
-            `<p>El problema tiene solución ilimitada (no acotada). La variable ${entra} debe entrar a la base pero ninguna variable puede salir.</p>`,
+            // `<p class="alert alert-danger" role="alert">El problema tiene solución ilimitada (no acotada). La variable ${entra} debe entrar a la base pero ninguna variable puede salir.</p>`,
+            `<p class="alert alert-danger" role="alert">El problema tiene solución ilimitada.</p>`,
             "error"
           ),
             (optimo = !1);
@@ -812,7 +808,8 @@ function calcular(
               "pivote"
             ),
             interfazusuario.mostrarMensaje(
-              `<p>Ingresa la variable <strong>${entra}</strong> y sale de la base la variable <strong>${sale}</strong>. El elemento pivote es <strong>${pivote}</strong></p>`,
+              // `<p>Ingresa la variable <strong>${entra}</strong> y sale de la base la variable <strong>${sale}</strong>. El elemento pivote es <strong>${pivote}</strong></p>`,
+              `<p>El elemento pivote es <strong>${pivote}</strong></p>`,
               "intermedio"
             ),
             indice++,
@@ -832,7 +829,8 @@ function calcular(
       }
     else
       interfazusuario.mostrarMensaje(
-        "<p>Se han finalizado las iteraciones de la primera fase y existen variables artificiales en la base con valores estrictamente mayor que 0, por lo que el problema no tiene solución (infactible).</p>",
+        // "<p class='error'>Se han finalizado las iteraciones de la primera fase y existen variables artificiales en la base con valores estrictamente mayor que 0, por lo que el problema no tiene solución (infactible).</p>",
+        `<p class="alert alert-danger" role="alert">El problema no tiene solución.</p>`,
         "error"
       ),
         (optimo = !1);
@@ -842,7 +840,8 @@ function calcular(
         const columnapivote = problema.varEntrante(maxminSeleccionado),
           entra = problema.posicion_costes[columnapivote];
         interfazusuario.mostrarMensaje(
-          `<p>El problema tiene solución ilimitada (no acotada). La variable ${entra} debe entrar a la base pero ninguna variable puede salir.</p>`,
+          // `<p class = 'error'>El problema tiene solución ilimitada (no acotada). La variable ${entra} debe entrar a la base pero ninguna variable puede salir.</p>`,
+          `<p class="alert alert-danger" role="alert">El problema no tiene solución.</p>`,
           "error"
         ),
           (optimo = !1);
