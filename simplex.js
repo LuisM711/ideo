@@ -17,17 +17,17 @@ class Interfaz {
     contenido +=
       '<div class="contenedor-objetivo"><div><p><label class="texto-simplex">Objetivo:</label><select name="seleccionar-objetivo" id="seleccionar-objetivo" class="seleccionar-objetivo form-select" required="required" aria-required="true"><option value="Maximizar">Maximizar</option><option value="Minimizar">Minimizar</option></select></p></div></div><h3>Función Objetivo: </h3><p>';
     for (let i = 1; i <= variable; i++)
-      (contenido += `<input type="text" id="x${i}" class="coeficientes" pattern="[-]?[0-9]+[/.]?[0-9]*" title="Sólo se aceptan números enteros, decimales (con punto) y fracciones"><label for="x${i}">X<sub>${i}</sub></label>+`),
+      (contenido += `<input type="text" id="x${i}" class="coeficientes" pattern="[-]?[0-9]+[/.]?[0-9]*" title="Sólo se aceptan números enteros, decimales (con punto) y fracciones" onclick = "this.select();"><label for="x${i}">X<sub>${i}</sub></label>+`),
         (noNegatividad += `X<sub>${i}</sub>, `);
     contenido = `${contenido.slice(0, -1)}</p><h3>Restricciones</h3>`;
     for (let i = 1; i <= restriccion; i++) {
       contenido += `<p><strong>Restricción ${i}:</strong></p><p>`;
       for (let j = 1; j <= variable; j++)
-        contenido += `<input type="text" id="x${i}-${j}" class="coeficientes" pattern="[-]?[0-9]+[/.]?[0-9]*" title="Sólo se aceptan números enteros, decimales (con punto) y fracciones"><label for="x${i}-${j}">X<sub>${j}</sub></label>+`;
+        contenido += `<input type="text" id="x${i}-${j}" class="coeficientes" pattern="[-]?[0-9]+[/.]?[0-9]*" title="Sólo se aceptan números enteros, decimales (con punto) y fracciones" onclick = "this.select();"><label for="x${i}-${j}">X<sub>${j}</sub></label>+`;
       contenido = `${contenido.slice(
         0,
         -1
-      )}<select id="signo${i}" class="signo-restriccion form-select"><option value="≤">≤</option><option value="≥">≥</option><option value="=">=</option></select><input type="text" id="y${i}" class="coeficientes" pattern="[-]?[0-9]+[/.]?[0-9]*" title="Sólo se aceptan números enteros, decimales (con punto) y fracciones"></p>`;
+      )}<select id="signo${i}" class="signo-restriccion form-select"><option value="≤">≤</option><option value="≥">≥</option><option value="=">=</option></select><input type="text" id="y${i}" class="coeficientes" pattern="[-]?[0-9]+[/.]?[0-9]*" title="Sólo se aceptan números enteros, decimales (con punto) y fracciones" onclick = "this.select();"></p>`;
     }
     (contenido += `<p id="no-negatividad">${noNegatividad.slice(
       0,
@@ -160,14 +160,14 @@ class Interfaz {
   }
   btnEditar(texto, contenedor, id) {
     const botonEditar = document.createElement("a");
-    (botonEditar.classList.add("editar", "btn", "btn-primary")),
+    (botonEditar.classList.add("editar", "btn", "btn-primary", "bt")),
       (botonEditar.id = id),
       (botonEditar.innerText = texto),
       contenedor.insertBefore(botonEditar, contenedor.children[0]);
   }
   btnNuevoProblema() {
     const botonNuevo = document.createElement("a");
-    (botonNuevo.classList.add("nuevo-problema", "btn", "btn-primary")),
+    (botonNuevo.classList.add("nuevo-problema", "btn", "btn-primary", "bt")),
       (botonNuevo.innerText = "Nuevo Problema"),
       (botonNuevo.id = "nuevo-problema"),
       divEcuaciones.insertBefore(botonNuevo, divEcuaciones.children[0]),
@@ -859,7 +859,8 @@ function calcular(
             "pivote"
           ),
           interfazusuario.mostrarMensaje(
-            `<p>Ingresa la variable <strong>${entra}</strong> y sale de la base la variable <strong>${sale}</strong>. El elemento pivote es <strong>${pivote}</strong></p>`,
+            // `<p>Ingresa la variable <strong>${entra}</strong> y sale de la base la variable <strong>${sale}</strong>. El elemento pivote es <strong>${pivote}</strong></p>`,
+            `<p>El elemento pivote es <strong>${pivote}</strong></p>`,
             "intermedio"
           ),
           indice++,
